@@ -3,6 +3,7 @@ package com.yassineabou.clock.util.components
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Alarm
 import androidx.compose.material.icons.filled.HourglassEmpty
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Icon
 import androidx.compose.material3.NavigationBar
@@ -12,10 +13,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import com.yassineabou.clock.R
 import com.yassineabou.clock.ui.Screen
 import com.yassineabou.clock.ui.theme.ClockTheme
 
@@ -42,7 +45,7 @@ private fun BottomNavigationPreviewDark() {
 }
 
 data class BottomBarItem(
-    val name: String,
+    val name: @Composable () -> String,
     val route: String,
     val icon: ImageVector,
 )
@@ -68,12 +71,12 @@ fun BottomNavigationBar(
                     }
                 },
                 label = {
-                    Text(text = item.name)
+                    Text(text = item.name())
                 },
                 icon = {
                     Icon(
                         imageVector = item.icon,
-                        contentDescription = item.name,
+                        contentDescription = null,
                     )
                 },
             )
@@ -83,26 +86,24 @@ fun BottomNavigationBar(
 
 val listBottomBarItems = listOf(
     BottomBarItem(
-        name = "Alarm",
+        name = { stringResource(R.string.alarm) },
         route = Screen.AlarmsList.route,
         icon = Icons.Default.Alarm,
     ),
-    /*
-    BottomBarItem(
-        name = "Clock",
-        route = Screen.Clock.route,
-        icon = Icons.Default.Language,
-    ),
 
-     */
     BottomBarItem(
-        name = "Stopwatch",
+        name = { stringResource(R.string.stopwatch) },
         route = Screen.Stopwatch.route,
         icon = Icons.Default.Timer,
     ),
     BottomBarItem(
-        name = "Timer",
+        name = { stringResource(R.string.timer) },
         route = Screen.Timer.route,
         icon = Icons.Default.HourglassEmpty,
+    ),
+    BottomBarItem(
+        name = { stringResource(R.string.settings) },
+        route = Screen.Settings.route,
+        icon = Icons.Default.Settings,
     ),
 )

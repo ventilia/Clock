@@ -8,6 +8,7 @@ sealed class Screen(val route: String) {
     object CreateAlarm : Screen("CreateAlarm")
     object Stopwatch : Screen("Stopwatch")
     object Timer : Screen("Timer")
+    object Settings : Screen("Settings")
 
     companion object {
         val timerDeepLink: List<NavDeepLink> = listOf(

@@ -46,6 +46,17 @@ The animation is added to the app to increase engagement. Also, you can create o
      <img src="https://i.imgur.com/qfm8Vkm.gif" style="flex:1; margin:5px;" height="450">
 </div>
 
+### This is a Fork
+This repository is a fork of the original [Clock by yassineAbou](https://github.com/yassineAbou/Clock).
+
+## Changes Made
+- Added settings screen with language switch (English/Russian).
+- Implemented full Russian localization.
+- Added links to GitHub repositories in settings.
+- ...
+
+
+
 ## Features
 
 <p>For full clock app functionality, permissions vary by Android version:</p>

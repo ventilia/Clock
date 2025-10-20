@@ -1,5 +1,7 @@
 package com.yassineabou.clock.ui
 
+import android.content.Context
+import android.content.res.Configuration
 import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -50,6 +52,7 @@ import com.yassineabou.clock.data.model.TimerState
 import com.yassineabou.clock.ui.alarm.AlarmViewModel
 import com.yassineabou.clock.ui.alarm.AlarmsListScreen
 import com.yassineabou.clock.ui.alarm.CreateAlarmScreen
+import com.yassineabou.clock.ui.settings.SettingsScreen
 import com.yassineabou.clock.ui.stopwatch.StopwatchScreen
 import com.yassineabou.clock.ui.stopwatch.StopwatchViewModel
 import com.yassineabou.clock.ui.theme.ClockTheme
@@ -61,6 +64,7 @@ import com.yassineabou.clock.util.components.RequestNotificationPermission
 import com.yassineabou.clock.util.components.listBottomBarItems
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
+import java.util.Locale
 import kotlin.time.ExperimentalTime
 
 @AndroidEntryPoint
@@ -92,6 +96,17 @@ class MainActivity : ComponentActivity() {
                 ClockApp()
             }
         }
+    }
+
+    override fun attachBaseContext(base: Context) {
+        val prefs = base.getSharedPreferences("app_prefs", MODE_PRIVATE)
+        val language = prefs.getString("app_language", "en") ?: "en"
+        val locale = Locale(language)
+        Locale.setDefault(locale)
+        val config = Configuration(base.resources.configuration)
+        config.setLocale(locale)
+        val context = base.createConfigurationContext(config)
+        super.attachBaseContext(context)
     }
 }
 
@@ -219,6 +234,9 @@ fun Navigation(navController: NavHostController, modifier: Modifier = Modifier) 
                 alarmCreationState = alarmCreationState,
                 navigateToAlarmsList = { navController.navigate(Screen.AlarmsList.route) },
             )
+        }
+        composable(Screen.Settings.route) {
+            SettingsScreen(modifier = modifier)
         }
     }
 }
