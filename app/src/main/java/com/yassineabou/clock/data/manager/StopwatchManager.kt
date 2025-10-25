@@ -13,7 +13,8 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlin.concurrent.fixedRateTimer
 import kotlin.time.Duration
-import kotlin.time.Duration.Companion.seconds
+import kotlin.time.Duration.Companion.milliseconds
+
 
 @Singleton
 class StopwatchManager @Inject constructor(
@@ -26,6 +27,7 @@ class StopwatchManager @Inject constructor(
     private val secondFlow = MutableStateFlow("00")
     private val minuteFlow = MutableStateFlow("00")
     private val hourFlow = MutableStateFlow("00")
+    private val msFlow = MutableStateFlow("00")
     private val isPlayingFlow = MutableStateFlow(false)
     private val isResetFlow = MutableStateFlow(true)
 
@@ -33,13 +35,15 @@ class StopwatchManager @Inject constructor(
         secondFlow,
         minuteFlow,
         hourFlow,
+        msFlow,  // Добавлено в combineTuple
         isPlayingFlow,
         isResetFlow,
-    ).map { (second, minute, hour, isPlaying, isReset) ->
+    ).map { (second, minute, hour, ms, isPlaying, isReset) ->
         StopwatchState(
             second = second,
             minute = minute,
             hour = hour,
+            ms = ms,  // Добавлено
             isPlaying = isPlaying,
             isReset = isReset,
         )
@@ -49,8 +53,8 @@ class StopwatchManager @Inject constructor(
     private var timer: Timer? = null
 
     fun start() {
-        timer = fixedRateTimer(initialDelay = 1000L, period = 1000L) {
-            duration = duration.plus(1.seconds)
+        timer = fixedRateTimer(initialDelay = 10L, period = 10L) {
+            duration = duration.plus(10.milliseconds)
             updateStopwatchState()
         }
         isPlayingFlow.value = true
@@ -61,16 +65,19 @@ class StopwatchManager @Inject constructor(
     }
 
     private fun updateStopwatchState() {
-        duration.toComponents { hours, minutes, seconds, _ ->
+        duration.toComponents { hours, minutes, seconds, nanoseconds ->
+            val ms = (nanoseconds / 1_000_000 / 10).toInt()
             secondFlow.value = seconds.pad()
             minuteFlow.value = minutes.pad()
             hourFlow.value = hours.toInt().pad()
+            msFlow.value = ms.pad()
         }
     }
 
     fun lap() {
-        val time = duration.toComponents { hours, minutes, seconds, _ ->
-            String.format(TIME_FORMAT, hours, minutes, seconds)
+        val time = duration.toComponents { hours, minutes, seconds, nanoseconds ->
+            val ms = (nanoseconds / 1_000_000 / 10).toInt()
+            String.format("%s:%02d", String.format(TIME_FORMAT, hours, minutes, seconds), ms)
         }
         lapTimes.add(time)
     }

@@ -32,13 +32,20 @@ class StopwatchWorker @AssistedInject constructor(
 
             setForeground(foregroundInfo)
 
+            var previousSecond = ""
+
             stopwatchManager.stopwatchState.collectLatest {
                 if (!it.isReset) {
-                    stopwatchNotificationHelper.updateStopwatchWorkerNotification(
-                        time = "${it.hour}:${it.minute}:${it.second}",
-                        isPlaying = it.isPlaying,
-                        lastLapIndex = stopwatchManager.lapTimes.lastIndex,
-                    )
+                    val msDisplay = if (it.isPlaying) "00" else it.ms
+                    val currentTime = "${it.hour}:${it.minute}:${it.second}:${msDisplay}"
+                    if (it.second != previousSecond) {
+                        stopwatchNotificationHelper.updateStopwatchWorkerNotification(
+                            time = currentTime,
+                            isPlaying = it.isPlaying,
+                            lastLapIndex = stopwatchManager.lapTimes.lastIndex,
+                        )
+                        previousSecond = it.second
+                    }
                 }
             }
 

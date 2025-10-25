@@ -58,12 +58,12 @@ import kotlinx.coroutines.launch
 private fun StopwatchScreenPreview() {
     val lapTimes = mutableListOf<String>().apply {
         for (i in 0..20) {
-            add("00:00:${String.format("%02d", i)}")
+            add("00:00:${String.format("%02d", i)}:00")
         }
     }.toList()
     ClockTheme {
         StopwatchScreen(
-            stopwatchState = StopwatchState(second = "09", isPlaying = false, isReset = false),
+            stopwatchState = StopwatchState(second = "09", ms = "00", isPlaying = false, isReset = false),
             stopwatchActions = object : StopwatchActions {},
             lapTimes = lapTimes,
         )
@@ -123,6 +123,7 @@ fun StopwatchScreen(
                     hours = stopwatchState.hour,
                     minutes = stopwatchState.minute,
                     seconds = stopwatchState.second,
+                    ms = stopwatchState.ms,
                 )
                 AnimatedVisibility(visible = lapTimes.isNotEmpty()) {
                     LineSeparator(modifier = Modifier.padding(dimensionResource(id = com.intuit.sdp.R.dimen._20sdp)))
@@ -169,6 +170,7 @@ private fun Stopwatch(
     hours: String,
     minutes: String,
     seconds: String,
+    ms: String,
     modifier: Modifier = Modifier,
 ) {
     Row(modifier = modifier) {
@@ -177,6 +179,8 @@ private fun Stopwatch(
         TimeUnitDisplay(unit = minutes)
         TimeUnitDisplay(unit = ":")
         TimeUnitDisplay(unit = seconds)
+        TimeUnitDisplay(unit = ":")
+        TimeUnitDisplay(unit = ms)
     }
 }
 
