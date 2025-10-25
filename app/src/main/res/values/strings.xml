@@ -65,4 +65,10 @@
     <string name="third">Third</string>
     <string name="eighth">Eighth</string>
     <string name="tenth">Tenth</string>
+
+    <string name="timer_completed">Timer completed</string>
+    <string name="dismiss">Dismiss</string>
+    <string name="restart">Restart</string>
+    <string name="alarm_ringing">Alarm is ringing</string>
+    <string name="snooze">Snooze</string>
 </resources>

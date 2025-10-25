@@ -40,4 +40,14 @@ class TimerViewModel @Inject constructor(
     override fun reset() {
         timerManager.reset()
     }
+
+
+    fun dismiss() {
+        timerManager.dismissTimer()
+    }
+
+
+    fun restart() {
+        timerManager.restartTimer()
+    }
 }

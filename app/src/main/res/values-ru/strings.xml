@@ -65,4 +65,10 @@
     <string name="third">Треть</string>
     <string name="eighth">Восьмая</string>
     <string name="tenth">Десятая</string>
+
+    <string name="timer_completed">Таймер завершён</string>
+    <string name="dismiss">Отклонить</string>
+    <string name="restart">Перезапустить</string>
+    <string name="alarm_ringing">Будильник звонит</string>
+    <string name="snooze">Отложить</string>
 </resources>

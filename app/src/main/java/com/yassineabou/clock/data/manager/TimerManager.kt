@@ -40,9 +40,11 @@ class TimerManager @Inject constructor(
     private val isDoneFlow = MutableStateFlow(true)
     private val signalTriggerFlow = MutableStateFlow(0)
     private val signalColorFlow = MutableStateFlow(SignalColor.YELLOW.color)
+    private val isCompletedFlow = MutableStateFlow(false)
 
     private var thresholds: List<Float> = SignalIntervalMode.QUARTER.getThresholds()
     private val signaledQuarters = mutableSetOf<Float>()
+    private var initialTimeInMillis: Long = 0L
 
     val timerState = combineTuple(
         timeInMillisFlow,
@@ -55,7 +57,8 @@ class TimerManager @Inject constructor(
         isDoneFlow,
         signalTriggerFlow,
         signalColorFlow,
-    ).map { (timeInMillis, time, hour, minute, second, progress, isPlaying, isDone, signalTrigger, signalColor) ->
+        isCompletedFlow
+    ).map { (timeInMillis, time, hour, minute, second, progress, isPlaying, isDone, signalTrigger, signalColor, isCompleted) ->
         TimerState(
             timeInMillis = timeInMillis,
             hour = hour,
@@ -67,6 +70,7 @@ class TimerManager @Inject constructor(
             isDone = isDone,
             signalTrigger = signalTrigger,
             signalColor = signalColor,
+            isCompleted = isCompleted
         )
     }
 
@@ -87,9 +91,14 @@ class TimerManager @Inject constructor(
     fun setCountDownTimer() {
         timeInMillisFlow.value =
             (hourFlow.value.hours + minuteFlow.value.minutes + secondFlow.value.seconds).inWholeMilliseconds
+        initialTimeInMillis = timeInMillisFlow.value
         countDownTimerHelper = object : CountDownTimerHelper(timeInMillisFlow.value, 1000) {
             override fun onTimerTick(millisUntilFinished: Long) {
-                val progressValue = millisUntilFinished.toFloat() / timeInMillisFlow.value
+                val progressValue = if (initialTimeInMillis > 0) {
+                    millisUntilFinished.toFloat() / initialTimeInMillis
+                } else {
+                    0f
+                }
                 handleTimerValues(true, millisUntilFinished.formatTime(), progressValue)
                 for (threshold in thresholds) {
                     if (progressValue <= threshold && !signaledQuarters.contains(threshold)) {
@@ -102,6 +111,7 @@ class TimerManager @Inject constructor(
             override fun onTimerFinish() {
                 workRequestManager.enqueueWorker<TimerCompletedWorker>(TIMER_COMPLETED_TAG)
                 reset()
+                isCompletedFlow.value = true
             }
         }
     }
@@ -130,6 +140,24 @@ class TimerManager @Inject constructor(
             isDoneFlow.value = false
             loadSettings()
         }
+    }
+
+
+    fun dismissTimer() {
+        countDownTimerHelper?.restart()
+        workRequestManager.cancelWorker(TIMER_COMPLETED_TAG)
+        isCompletedFlow.value = false
+    }
+
+
+    fun restartTimer() {
+        countDownTimerHelper?.restart()
+        workRequestManager.cancelWorker(TIMER_COMPLETED_TAG)
+        timeInMillisFlow.value = initialTimeInMillis
+        isCompletedFlow.value = false
+        signaledQuarters.clear()
+        signalTriggerFlow.value = 0
+        start()
     }
 
     private fun handleTimerValues(

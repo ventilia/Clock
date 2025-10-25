@@ -1,6 +1,5 @@
 package com.yassineabou.clock.ui.timer
 
-import android.content.res.Configuration.ORIENTATION_PORTRAIT
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.core.FastOutLinearInEasing
@@ -29,6 +28,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -52,7 +52,9 @@ import com.yassineabou.clock.util.components.BackgroundIndicator
 import com.yassineabou.clock.util.components.ClockAppBar
 import com.yassineabou.clock.util.components.ClockButton
 import com.yassineabou.clock.util.components.NumberPicker
+import com.yassineabou.clock.util.components.TimerCompletedDialog
 import com.yassineabou.clock.util.parseInt
+import kotlinx.coroutines.launch
 
 @Preview(device = Devices.PIXEL_4_XL)
 @Composable
@@ -65,7 +67,7 @@ private fun TimerScreenPreview() {
     }
 }
 
-@Preview(device = Devices.TABLET, uiMode = ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
+@Preview(device = Devices.TABLET, uiMode = android.content.res.Configuration.ORIENTATION_PORTRAIT, widthDp = 768, heightDp = 1024)
 @Composable
 private fun TimerScreenDarkPreview() {
     ClockTheme(useDarkTheme = true) {
@@ -87,6 +89,7 @@ fun TimerScreen(
 ) {
     val isDoneTransition =
         updateTransition(timerState.isDone, label = stringResource(id = R.string.is_done))
+    val coroutineScope = rememberCoroutineScope()
 
     Surface(modifier = modifier) {
         BoxWithConstraints(
@@ -137,7 +140,7 @@ fun TimerScreen(
                     timeText = timerState.timeText,
                     progress = timerState.progress,
                     signalTrigger = timerState.signalTrigger,
-                    signalColor = timerState.signalColor,  // Добавлено: передача динамического цвета из состояния
+                    signalColor = timerState.signalColor,
                 )
             }
 
@@ -148,6 +151,21 @@ fun TimerScreen(
                 timerState = timerState,
                 timerActions = timerActions,
                 isDoneTransition = isDoneTransition,
+            )
+
+
+            TimerCompletedDialog(
+                showDialog = timerState.isCompleted,
+                onDismiss = {
+                    coroutineScope.launch {
+                        (timerActions as? TimerViewModel)?.dismiss()
+                    }
+                },
+                onRestart = {
+                    coroutineScope.launch {
+                        (timerActions as? TimerViewModel)?.restart()
+                    }
+                }
             )
         }
     }
@@ -247,13 +265,13 @@ private fun Timer(
     timeText: String,
     progress: Float,
     signalTrigger: Int,
-    signalColor: Color,  // Добавлено: параметр для динамического цвета сигнала
+    signalColor: Color,
 ) {
     Box(modifier = modifier) {
         BackgroundIndicator(
             progress = progress,
             signalTrigger = signalTrigger,
-            signalColor = signalColor,  // Добавлено: передача динамического цвета
+            signalColor = signalColor,
             modifier = modifier
                 .fillMaxSize()
                 .scale(scaleX = 1f, scaleY = 1f),
@@ -296,8 +314,7 @@ private fun Buttons(
                 text = stringResource(id = R.string.start),
                 onClick = { timerActions.start() },
                 enabled = timerState.timeInMillis != 0L,
-
-                )
+            )
         }
 
         isDoneTransition.AnimatedVisibility(

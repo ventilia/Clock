@@ -12,5 +12,6 @@ data class TimerState(
     val isPlaying: Boolean = false,
     val isDone: Boolean = true,
     val signalTrigger: Int = 0,
-    val signalColor: Color = Color.Yellow
+    val signalColor: Color = Color.Yellow,
+    val isCompleted: Boolean = false
 )
