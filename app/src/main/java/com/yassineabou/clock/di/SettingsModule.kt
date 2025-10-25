@@ -20,4 +20,7 @@ object SettingsModule {
     ): SharedPreferences {
         return context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)
     }
+
+    const val KEY_RINGTONE_URI = "alarm_timer_ringtone_uri"
+    const val KEY_APP_LANGUAGE = "app_language"
 }

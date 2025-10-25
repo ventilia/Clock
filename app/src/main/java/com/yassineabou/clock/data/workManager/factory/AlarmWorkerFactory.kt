@@ -8,6 +8,7 @@ import com.yassineabou.clock.data.repository.AlarmRepository
 import com.yassineabou.clock.data.workManager.worker.AlarmWorker
 import com.yassineabou.clock.util.helper.AlarmNotificationHelper
 import com.yassineabou.clock.util.helper.MediaPlayerHelper
+import com.yassineabou.clock.util.helper.RingtoneHelper
 import javax.inject.Inject
 
 class AlarmWorkerFactory @Inject constructor(
@@ -15,9 +16,10 @@ class AlarmWorkerFactory @Inject constructor(
     private val alarmNotificationHelper: AlarmNotificationHelper,
     private val mediaPlayerHelper: MediaPlayerHelper,
     private val workRequestManager: WorkRequestManager,
+    private val ringtoneHelper: RingtoneHelper,
 ) : ChildWorkerFactory {
 
     override fun create(appContext: Context, params: WorkerParameters): ListenableWorker {
-        return AlarmWorker(alarmRepository, alarmNotificationHelper, mediaPlayerHelper, workRequestManager, appContext, params)
+        return AlarmWorker(alarmRepository, alarmNotificationHelper, mediaPlayerHelper, workRequestManager, ringtoneHelper, appContext, params)
     }
 }

@@ -9,6 +9,7 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.yassineabou.clock.data.manager.TimerManager
 import com.yassineabou.clock.util.helper.MediaPlayerHelper
+import com.yassineabou.clock.util.helper.RingtoneHelper
 import com.yassineabou.clock.util.helper.TIMER_COMPLETED_NOTIFICATION_ID
 import com.yassineabou.clock.util.helper.TimerNotificationHelper
 import dagger.assisted.Assisted
@@ -21,12 +22,13 @@ class TimerCompletedWorker @AssistedInject constructor(
     @Assisted private val mediaPlayerHelper: MediaPlayerHelper,
     @Assisted private val timerNotificationHelper: TimerNotificationHelper,
     @Assisted private val timerManager: TimerManager,
+    @Assisted private val ringtoneHelper: RingtoneHelper,
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
     override suspend fun doWork(): Result {
         return try {
-            mediaPlayerHelper.prepare()
+            mediaPlayerHelper.prepare(ringtoneHelper.getRingtoneUri())
             mediaPlayerHelper.start()
 
             val foregroundInfo = ForegroundInfo(

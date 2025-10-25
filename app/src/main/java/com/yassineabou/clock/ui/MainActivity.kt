@@ -61,6 +61,7 @@ import com.yassineabou.clock.ui.timer.TimerViewModel
 import com.yassineabou.clock.util.components.BottomNavigationBar
 import com.yassineabou.clock.util.components.CheckExactAlarmPermission
 import com.yassineabou.clock.util.components.RequestNotificationPermission
+import com.yassineabou.clock.util.components.RequestMediaAudioPermission
 import com.yassineabou.clock.util.components.listBottomBarItems
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -92,6 +93,7 @@ class MainActivity : ComponentActivity() {
                     CheckExactAlarmPermission()
                 } else if (sdkVersion >= Build.VERSION_CODES.TIRAMISU) {
                     RequestNotificationPermission()
+                    RequestMediaAudioPermission()
                 }
                 ClockApp()
             }

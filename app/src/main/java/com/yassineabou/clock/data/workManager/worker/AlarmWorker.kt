@@ -15,6 +15,7 @@ import com.yassineabou.clock.data.repository.AlarmRepository
 import com.yassineabou.clock.util.helper.ALARM_WORKER_NOTIFICATION_ID
 import com.yassineabou.clock.util.helper.AlarmNotificationHelper
 import com.yassineabou.clock.util.helper.MediaPlayerHelper
+import com.yassineabou.clock.util.helper.RingtoneHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
 import kotlinx.coroutines.flow.collectLatest
@@ -26,12 +27,12 @@ class AlarmWorker @AssistedInject constructor(
     @Assisted private val alarmNotificationHelper: AlarmNotificationHelper,
     @Assisted private val mediaPlayerHelper: MediaPlayerHelper,
     @Assisted private val workRequestManager: WorkRequestManager,
+    @Assisted private val ringtoneHelper: RingtoneHelper,
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
     override suspend fun doWork(): Result {
         return try {
-            mediaPlayerHelper.prepare()
             val title = inputData.getString(TITLE) ?: ""
             val time = "${inputData.getString(HOUR)}:${inputData.getString(MINUTE)}"
 
@@ -42,6 +43,7 @@ class AlarmWorker @AssistedInject constructor(
             )
             setForeground(foregroundInfo)
 
+            mediaPlayerHelper.prepare(ringtoneHelper.getRingtoneUri())
             mediaPlayerHelper.start()
 
             alarmRepository.getAlarmByTime(
