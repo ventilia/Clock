@@ -1,5 +1,7 @@
 package com.yassineabou.clock.data.model
 
+import androidx.compose.ui.graphics.Color
+
 data class TimerState(
     val timeInMillis: Long = 0L,
     val timeText: String = "00:00:00",
@@ -9,4 +11,6 @@ data class TimerState(
     val progress: Float = 0f,
     val isPlaying: Boolean = false,
     val isDone: Boolean = true,
+    val signalTrigger: Int = 0,
+    val signalColor: Color = Color.Yellow
 )

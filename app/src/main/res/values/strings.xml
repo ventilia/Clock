@@ -51,4 +51,18 @@
     <string name="sun">Sun</string>
     <string name="ringtone">Ringtone</string>
     <string name="select_ringtone">Select Ringtone for Alarm and Timer</string>
+    <string name="timer_signal_settings">Timer Signal Settings</string>
+    <string name="enable_vibration">Enable Vibration</string>
+    <string name="signal_sound">Signal Sound</string>
+    <string name="select_signal_sound">Select Signal Sound</string>
+    <string name="signal_color">Signal Color</string>
+    <string name="signal_interval_mode">Signal Interval Mode</string>
+    <string name="yellow">Yellow</string>
+    <string name="red">Red</string>
+    <string name="green">Green</string>
+    <string name="half">Half</string>
+    <string name="quarter">Quarter</string>
+    <string name="third">Third</string>
+    <string name="eighth">Eighth</string>
+    <string name="tenth">Tenth</string>
 </resources>

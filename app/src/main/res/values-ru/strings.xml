@@ -51,4 +51,18 @@
     <string name="sun">Вс</string>
     <string name="ringtone">Рингтон</string>
     <string name="select_ringtone">Выберите рингтон для будильника и таймера</string>
+    <string name="timer_signal_settings">Настройки сигнала таймера</string>
+    <string name="enable_vibration">Включить вибрацию</string>
+    <string name="signal_sound">Звук сигнала</string>
+    <string name="select_signal_sound">Выберите звук сигнала</string>
+    <string name="signal_color">Цвет сигнала</string>
+    <string name="signal_interval_mode">Режим интервала сигнала</string>
+    <string name="yellow">Жёлтый</string>
+    <string name="red">Красный</string>
+    <string name="green">Зелёный</string>
+    <string name="half">Половина</string>
+    <string name="quarter">Четверть</string>
+    <string name="third">Треть</string>
+    <string name="eighth">Восьмая</string>
+    <string name="tenth">Десятая</string>
 </resources>

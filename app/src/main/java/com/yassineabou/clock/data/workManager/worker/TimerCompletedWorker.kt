@@ -3,6 +3,7 @@ package com.yassineabou.clock.data.workManager.worker
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -26,6 +27,7 @@ class TimerCompletedWorker @AssistedInject constructor(
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
+    @RequiresApi(Build.VERSION_CODES.S)
     override suspend fun doWork(): Result {
         return try {
             mediaPlayerHelper.prepare(ringtoneHelper.getRingtoneUri())
@@ -36,7 +38,12 @@ class TimerCompletedWorker @AssistedInject constructor(
                 timerNotificationHelper.showTimerCompletedNotification(),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0
             )
-            setForeground(foregroundInfo)
+
+            try {
+                setForeground(foregroundInfo)
+            } catch (e: android.app.ForegroundServiceStartNotAllowedException) {
+                return Result.failure()
+            }
 
             // Ensure the work lasts at least 5 seconds for the notification to be shown
             // because shorter durations may not provide enough time for the notification to be visible.

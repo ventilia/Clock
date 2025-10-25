@@ -23,4 +23,8 @@ object SettingsModule {
 
     const val KEY_RINGTONE_URI = "alarm_timer_ringtone_uri"
     const val KEY_APP_LANGUAGE = "app_language"
+    const val KEY_VIBRATION_ENABLED = "vibration_enabled"
+    const val KEY_SIGNAL_SOUND_URI = "signal_sound_uri"
+    const val KEY_SIGNAL_COLOR = "signal_color"
+    const val KEY_SIGNAL_INTERVAL_MODE = "signal_interval_mode"
 }

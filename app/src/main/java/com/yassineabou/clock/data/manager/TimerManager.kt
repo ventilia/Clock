@@ -1,12 +1,18 @@
 package com.yassineabou.clock.data.manager
 
+import android.content.SharedPreferences
+import com.yassineabou.clock.data.model.SignalColor
+import com.yassineabou.clock.data.model.SignalIntervalMode
 import com.yassineabou.clock.data.model.TimerState
 import com.yassineabou.clock.data.workManager.worker.TIMER_COMPLETED_TAG
 import com.yassineabou.clock.data.workManager.worker.TIMER_RUNNING_TAG
 import com.yassineabou.clock.data.workManager.worker.TimerCompletedWorker
 import com.yassineabou.clock.data.workManager.worker.TimerRunningWorker
+import com.yassineabou.clock.di.SettingsModule.KEY_SIGNAL_COLOR
+import com.yassineabou.clock.di.SettingsModule.KEY_SIGNAL_INTERVAL_MODE
 import com.yassineabou.clock.util.GlobalProperties.TIME_FORMAT
 import com.yassineabou.clock.util.helper.CountDownTimerHelper
+import com.yassineabou.clock.util.helper.TimerSignalHelper
 import com.zhuinden.flowcombinetuplekt.combineTuple
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
@@ -20,6 +26,8 @@ import kotlin.time.Duration.Companion.seconds
 @Singleton
 class TimerManager @Inject constructor(
     private val workRequestManager: WorkRequestManager,
+    private val timerSignalHelper: TimerSignalHelper,
+    private val sharedPreferences: SharedPreferences,
 ) {
 
     private val timeInMillisFlow = MutableStateFlow(0L)
@@ -30,6 +38,11 @@ class TimerManager @Inject constructor(
     private val progressFlow = MutableStateFlow(0f)
     private val isPlayingFlow = MutableStateFlow(false)
     private val isDoneFlow = MutableStateFlow(true)
+    private val signalTriggerFlow = MutableStateFlow(0)
+    private val signalColorFlow = MutableStateFlow(SignalColor.YELLOW.color)
+
+    private var thresholds: List<Float> = SignalIntervalMode.QUARTER.getThresholds()
+    private val signaledQuarters = mutableSetOf<Float>()
 
     val timerState = combineTuple(
         timeInMillisFlow,
@@ -40,7 +53,9 @@ class TimerManager @Inject constructor(
         progressFlow,
         isPlayingFlow,
         isDoneFlow,
-    ).map { (timeInMillis, time, hour, minute, second, progress, isPlaying, isDone) ->
+        signalTriggerFlow,
+        signalColorFlow,
+    ).map { (timeInMillis, time, hour, minute, second, progress, isPlaying, isDone, signalTrigger, signalColor) ->
         TimerState(
             timeInMillis = timeInMillis,
             hour = hour,
@@ -50,6 +65,8 @@ class TimerManager @Inject constructor(
             progress = progress,
             isPlaying = isPlaying,
             isDone = isDone,
+            signalTrigger = signalTrigger,
+            signalColor = signalColor,
         )
     }
 
@@ -74,6 +91,13 @@ class TimerManager @Inject constructor(
             override fun onTimerTick(millisUntilFinished: Long) {
                 val progressValue = millisUntilFinished.toFloat() / timeInMillisFlow.value
                 handleTimerValues(true, millisUntilFinished.formatTime(), progressValue)
+                for (threshold in thresholds) {
+                    if (progressValue <= threshold && !signaledQuarters.contains(threshold)) {
+                        timerSignalHelper.triggerSignal()
+                        signalTriggerFlow.value++
+                        signaledQuarters.add(threshold)
+                    }
+                }
             }
             override fun onTimerFinish() {
                 workRequestManager.enqueueWorker<TimerCompletedWorker>(TIMER_COMPLETED_TAG)
@@ -92,6 +116,9 @@ class TimerManager @Inject constructor(
         handleTimerValues(false, timeInMillisFlow.value.formatTime(), 0f)
         isDoneFlow.value = true
         workRequestManager.cancelWorker(TIMER_RUNNING_TAG)
+        signaledQuarters.clear()
+        signalTriggerFlow.value = 0
+        loadSettings()
     }
 
     fun start() {
@@ -101,6 +128,7 @@ class TimerManager @Inject constructor(
             progressFlow.value = 1f
             workRequestManager.enqueueWorker<TimerRunningWorker>(TIMER_RUNNING_TAG)
             isDoneFlow.value = false
+            loadSettings()
         }
     }
 
@@ -112,6 +140,14 @@ class TimerManager @Inject constructor(
         isPlayingFlow.value = isPlaying
         timeTextFlow.value = text
         progressFlow.value = progress
+    }
+
+    private fun loadSettings() {
+        val intervalModeStr = sharedPreferences.getString(KEY_SIGNAL_INTERVAL_MODE, "QUARTER")
+        thresholds = SignalIntervalMode.fromString(intervalModeStr).getThresholds()
+
+        val colorStr = sharedPreferences.getString(KEY_SIGNAL_COLOR, "YELLOW")
+        signalColorFlow.value = SignalColor.fromString(colorStr).color
     }
 
     fun Long.formatTime(): String = String.format(

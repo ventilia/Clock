@@ -20,6 +20,6 @@ class AlarmWorkerFactory @Inject constructor(
 ) : ChildWorkerFactory {
 
     override fun create(appContext: Context, params: WorkerParameters): ListenableWorker {
-        return AlarmWorker(alarmRepository, alarmNotificationHelper, mediaPlayerHelper, workRequestManager, ringtoneHelper, appContext, params)
+        return AlarmWorker(alarmRepository, mediaPlayerHelper, alarmNotificationHelper, ringtoneHelper, workRequestManager, appContext, params)
     }
 }

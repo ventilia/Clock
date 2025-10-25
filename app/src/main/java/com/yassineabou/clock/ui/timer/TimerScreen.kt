@@ -35,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.Center
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -135,6 +136,8 @@ fun TimerScreen(
                     modifier = Modifier.size(dimensionResource(id = com.intuit.sdp.R.dimen._268sdp)),
                     timeText = timerState.timeText,
                     progress = timerState.progress,
+                    signalTrigger = timerState.signalTrigger,
+                    signalColor = timerState.signalColor,  // Добавлено: передача динамического цвета из состояния
                 )
             }
 
@@ -243,10 +246,14 @@ private fun Timer(
     modifier: Modifier = Modifier,
     timeText: String,
     progress: Float,
+    signalTrigger: Int,
+    signalColor: Color,  // Добавлено: параметр для динамического цвета сигнала
 ) {
     Box(modifier = modifier) {
         BackgroundIndicator(
             progress = progress,
+            signalTrigger = signalTrigger,
+            signalColor = signalColor,  // Добавлено: передача динамического цвета
             modifier = modifier
                 .fillMaxSize()
                 .scale(scaleX = 1f, scaleY = 1f),
@@ -290,7 +297,7 @@ private fun Buttons(
                 onClick = { timerActions.start() },
                 enabled = timerState.timeInMillis != 0L,
 
-            )
+                )
         }
 
         isDoneTransition.AnimatedVisibility(

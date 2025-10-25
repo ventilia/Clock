@@ -3,6 +3,7 @@ package com.yassineabou.clock.data.workManager.worker
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -22,6 +23,7 @@ class TimerRunningWorker @AssistedInject constructor(
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
+    @RequiresApi(Build.VERSION_CODES.S)
     override suspend fun doWork(): Result {
         return try {
             val foregroundInfo = ForegroundInfo(
@@ -30,7 +32,11 @@ class TimerRunningWorker @AssistedInject constructor(
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0
             )
 
-            setForeground(foregroundInfo)
+            try {
+                setForeground(foregroundInfo)
+            } catch (e: android.app.ForegroundServiceStartNotAllowedException) {
+                return Result.failure()
+            }
 
             timerManager.timerState.collectLatest {
                 if (!it.isDone) {

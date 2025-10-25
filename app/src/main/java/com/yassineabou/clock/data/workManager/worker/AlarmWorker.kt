@@ -3,6 +3,7 @@ package com.yassineabou.clock.data.workManager.worker
 import android.content.Context
 import android.content.pm.ServiceInfo
 import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
@@ -18,19 +19,20 @@ import com.yassineabou.clock.util.helper.MediaPlayerHelper
 import com.yassineabou.clock.util.helper.RingtoneHelper
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.collectLatest
-import kotlin.coroutines.cancellation.CancellationException
 
 @HiltWorker
 class AlarmWorker @AssistedInject constructor(
     @Assisted private val alarmRepository: AlarmRepository,
-    @Assisted private val alarmNotificationHelper: AlarmNotificationHelper,
     @Assisted private val mediaPlayerHelper: MediaPlayerHelper,
-    @Assisted private val workRequestManager: WorkRequestManager,
+    @Assisted private val alarmNotificationHelper: AlarmNotificationHelper,
     @Assisted private val ringtoneHelper: RingtoneHelper,
+    private val workRequestManager: WorkRequestManager,
     @Assisted ctx: Context,
     @Assisted params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
+    @RequiresApi(Build.VERSION_CODES.S)
     override suspend fun doWork(): Result {
         return try {
             val title = inputData.getString(TITLE) ?: ""
@@ -41,7 +43,12 @@ class AlarmWorker @AssistedInject constructor(
                 alarmNotificationHelper.getAlarmBaseNotification(title, time).build(),
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) ServiceInfo.FOREGROUND_SERVICE_TYPE_MEDIA_PLAYBACK else 0
             )
-            setForeground(foregroundInfo)
+
+            try {
+                setForeground(foregroundInfo)
+            } catch (e: android.app.ForegroundServiceStartNotAllowedException) {
+                return Result.failure()
+            }
 
             mediaPlayerHelper.prepare(ringtoneHelper.getRingtoneUri())
             mediaPlayerHelper.start()
