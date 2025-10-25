@@ -41,4 +41,12 @@
     <string name="russian">Russian</string>
     <string name="original_repo">Original repository by yassineAbou. Contribute to the project.</string>
     <string name="modified_by">Project modified by venttt</string>
+    <string name="tomorrow">Tomorrow</string>
+    <string name="mon">Mon</string>
+    <string name="tue">Tue</string>
+    <string name="wed">Wed</string>
+    <string name="thu">Thu</string>
+    <string name="fri">Fri</string>
+    <string name="sat">Sat</string>
+    <string name="sun">Sun</string>
 </resources>

@@ -147,7 +147,7 @@ private fun CustomizeAlarmEvent(
             CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.disabled) {
                 Text(
                     modifier = Modifier.padding(dimensionResource(id = R.dimen._8sdp)),
-                    text = alarmCreationState.description,
+                    text = translateDescription(alarmCreationState.description),
                     style = MaterialTheme.typography.titleMedium,
                 )
             }
@@ -203,7 +203,7 @@ private fun AlarmPicker(
             NumberPicker(
                 modifier = Modifier.weight(1f),
                 number = hours,
-                timeUnit = "Hours",
+                timeUnit = stringResource(id = com.yassineabou.clock.R.string.hours),
                 onNumberChange = { value ->
                     if (value.text.checkNumberPicker(maxNumber = 23)) {
                         hours = value
@@ -226,7 +226,7 @@ private fun AlarmPicker(
             NumberPicker(
                 modifier = Modifier.weight(1f),
                 number = minutes,
-                timeUnit = "Minutes",
+                timeUnit = stringResource(id = com.yassineabou.clock.R.string.minutes),
                 textStyle = textStyle,
                 backgroundColor = cardContainerColor,
                 onNumberChange = { value ->
@@ -259,7 +259,7 @@ private fun WeekDays(
         daysSelected.forEach { (day, isSelected) ->
             CustomChip(
                 isChecked = isSelected,
-                text = day,
+                text = translateDay(day),
                 onChecked = { isChecked ->
                     daysSelected[day] = isChecked
                     val activeDays = daysSelected.filterValues { it }.keys
@@ -343,5 +343,28 @@ private fun Buttons(
                 Text(text = stringResource(id = com.yassineabou.clock.R.string.save))
             }
         }
+    }
+}
+
+@Composable
+private fun translateDay(day: String): String {
+    return when (day.lowercase()) {
+        "mon" -> stringResource(id = com.yassineabou.clock.R.string.mon)
+        "tue" -> stringResource(id = com.yassineabou.clock.R.string.tue)
+        "wed" -> stringResource(id = com.yassineabou.clock.R.string.wed)
+        "thu" -> stringResource(id = com.yassineabou.clock.R.string.thu)
+        "fri" -> stringResource(id = com.yassineabou.clock.R.string.fri)
+        "sat" -> stringResource(id = com.yassineabou.clock.R.string.sat)
+        "sun" -> stringResource(id = com.yassineabou.clock.R.string.sun)
+        else -> day
+    }
+}
+
+@Composable
+private fun translateDescription(description: String): String {
+    return if (description.contains("Tomorrow", ignoreCase = true)) {
+        description.replace("Tomorrow", stringResource(id = com.yassineabou.clock.R.string.tomorrow), ignoreCase = true)
+    } else {
+        description.split(" ").map { translateDay(it) }.joinToString(" ")
     }
 }
