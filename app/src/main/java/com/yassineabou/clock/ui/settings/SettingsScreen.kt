@@ -425,7 +425,7 @@ private fun getModeStringId(name: String): Int {
 }
 
 private fun applyLanguage(context: Context, language: String, prefs: SharedPreferences) {
-    prefs.edit().putString("app_language", language).apply()
+    prefs.edit().putString("app_language", language).commit()
 
     val locale = Locale(language)
     Locale.setDefault(locale)
