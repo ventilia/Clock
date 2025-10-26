@@ -50,11 +50,17 @@ The animation is added to the app to increase engagement. Also, you can create o
 This repository is a fork of the original [Clock by yassineAbou](https://github.com/yassineAbou/Clock).
 
 ## Changes Made
-- Added settings screen with language switch (English/Russian).
-- Implemented full Russian localization.
-- Added links to GitHub repositories in settings.
-- ...
-
+- Added Russian localization for the entire app, including translated days and descriptions in CreateAlarmScreen.
+- Implemented a settings screen with language switch (English/Russian) and persistence for selected language.
+- Added GitHub links to the settings screen.
+- Enhanced stopwatch with millisecond support, including conditional display in notifications 
+- Added ringtone selection in settings for a common ringtone used in alarms and timers, integrated with system RingtonePicker, SharedPreferences for storage, and dynamic URI handling in MediaPlayerHelper.
+- Added necessary permissions (READ_MEDIA_AUDIO) with runtime requests.
+- Localized new strings for the ringtone block and repositioned it below the language selector for better UI flow.
+- Added Timer Signal Enhancements: vibration, sound signals, color changes, and interval modes in settings.
+- Added TimerCompletedDialog with dismiss and restart functionality.
+- Fixed language selection persistence in SettingsScreen.
+- Ensured Hilt integration for SettingsViewModel and fixed stringResource usage in non-composable contexts.
 
 
 ## Features
@@ -93,6 +99,7 @@ com.yassineabou.clock        # Root Package
 │  
 ├── ui                   # UI Layer: Activity, Screens, ViewModels
 │   ├── alarm            # Manages alarm functionalities
+|   ├── settings         # Manages app settings (language, ringtone, signals)
 |   ├── stopwatch        # Manages stopwatch functionalities
 |   ├── theme            # Handles app theme preferences
 |   ├── timer            # Manages timer functionalities
